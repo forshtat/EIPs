@@ -133,8 +133,8 @@
             "properties": {
                 "encoding": {
                     "type": "string",
-                    "enum": ["inplace", "inplace_struct", "mapping", "dynamic_array", "bytes"],
-                    "description": "Storage encoding. 'inplace': primitive value type stored directly at its slot. 'inplace_struct': struct type with members. 'mapping', 'dynamic_array', 'bytes': complex types requiring slot derivation per compiler.language."
+                    "enum": ["inplace", "inplace_struct", "inplace_array", "mapping", "dynamic_array", "bytes"],
+                    "description": "Storage encoding. 'inplace': primitive value type stored directly at its slot. 'inplace_struct': struct type with members. 'inplace_array': fixed-size array, stored in place, element type given by 'value'. 'mapping', 'dynamic_array', 'bytes': complex types requiring slot derivation per compiler.language."
                 },
                 "label": {
                     "type": "string",
@@ -150,11 +150,7 @@
                 },
                 "value": {
                     "type": "string",
-                    "description": "For mapping and dynamic_array types: type identifier of the value/element type."
-                },
-                "base": {
-                    "type": "string",
-                    "description": "For dynamic_array types: type identifier of the element type (alias of 'value', kept for compatibility with Solidity compiler output)."
+                    "description": "For mapping, inplace_array and dynamic_array types: type identifier of the value/element type."
                 },
                 "members": {
                     "type": "array",
@@ -163,6 +159,17 @@
                 }
             },
             "required": ["encoding", "label", "numberOfBytes"],
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "encoding": { "enum": ["mapping", "inplace_array", "dynamic_array"] }
+                        },
+                        "required": ["encoding"]
+                    },
+                    "then": { "required": ["value"] }
+                }
+            ],
             "additionalProperties": false
         },
 
